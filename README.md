@@ -1,63 +1,103 @@
-# Exam environment check
+# Exam Environment Check
 
-Run this before your exam day to confirm your machine can run the exam app. It uses the same setup as the exam.
+Please run this check **before your exam day**. It uses the same setup as the exam, so if it works here, it will work on the day.
 
-## Requirements
+It takes about 5 minutes.
 
-- PHP 8.2 or higher
-- Git
-- VS Code
+---
 
-Node.js is not needed. Composer and internet access are only needed if the `vendor` folder is missing (see [Fixing the missing `vendor` folder](#fixing-the-missing-vendor-folder)).
+## What you need
 
-## Steps
+- **PHP 8.2 or higher**
+- **Git**
+- **VS Code**
 
-1. Open this folder in VS Code.
-2. Rename `.env.example` to `.env` (in the VS Code Explorer, right-click the file > **Rename**). If `.env` already exists, skip this.
-3. Open a terminal (**Terminal > New Terminal**) and run:
+You do **not** need Node.js.
+
+You only need **Composer** and an **internet connection** if the `vendor` folder is missing. See [Fixing the missing `vendor` folder](#fixing-the-missing-vendor-folder).
+
+---
+
+## Run the check
+
+1. **Open this folder in VS Code.**
+
+2. **Create your `.env` file.**
+   In the VS Code Explorer, right-click `.env.example` > **Rename**, and rename it to `.env`.
+   *(If a `.env` file is already there, skip this step.)*
+
+3. **Start the app.**
+   Open a terminal (**Terminal > New Terminal**) and run:
 
    ```
    php artisan serve
    ```
 
-4. Open http://127.0.0.1:8000 in your browser.
-5. If the page says **"Your machine is ready for the exam"**, you're done. Let your interviewer know.
-6. If any check says **"Fix needed"**, follow the note next to it, restart the server (`Ctrl+C`, then `php artisan serve` again), and reload the page.
+4. **Open the app in your browser:** http://127.0.0.1:8000
 
-Also make sure AI extensions in VS Code (such as GitHub Copilot) can be disabled before the exam.
+5. **Read the result.**
+   - ✅ If you see **"Your machine is ready for the exam"**, you're done. Let your interviewer know.
+   - ⚠️ If any check says **"Fix needed"**:
+     1. Follow the note shown next to that check.
+     2. Stop the server with `Ctrl+C`.
+     3. Run `php artisan serve` again.
+     4. Reload the page.
+
+---
+
+## Before exam day: AI extensions
+
+The exam is done without AI tools. Make sure you know how to **disable AI extensions in VS Code** (such as GitHub Copilot) before the exam starts.
+
+---
 
 ## Troubleshooting
 
-| Problem | Fix |
-|---|---|
-| `php` is not recognized | PHP isn't installed or isn't on your PATH. Install PHP 8.2+ and restart VS Code. |
-| `No application encryption key has been specified` or config errors | `.env` is missing. Rename `.env.example` to `.env` (step 2), then restart the server. |
-| `could not find driver` | Enable `pdo_sqlite` in `php.ini`, then restart the server. Run `php --ini` to find the file. |
-| `Failed opening required ... vendor/autoload.php` or `Failed to open stream: No such file or directory ... artisan on line 10` | The `vendor` folder is missing. It is not stored in Git, so a plain `git clone` won't include it. Run `composer install`; see [Fixing the missing `vendor` folder](#fixing-the-missing-vendor-folder) below. |
-| `Class "..." not found` | The `vendor` folder is incomplete. Run `composer install` (see the section below). |
-| Autoload errors after moving or copying the folder (`Class ... not found`, `Unable to read ... services.php`) | Delete `bootstrap/cache/packages.php` and `bootstrap/cache/services.php` (they're rebuilt automatically), then restart the server. |
-| Autoload errors persist | If Composer is installed, run `composer dump-autoload` in the project folder, then restart the server. |
-| `Address already in use` | Run `php artisan serve --port=8080` and open http://127.0.0.1:8080. |
+Find the message you see, then apply the fix. After any fix, restart the server (`Ctrl+C`, then `php artisan serve`).
+
+| If you see... | What it means | What to do |
+|---|---|---|
+| `php` is not recognized | PHP isn't installed or isn't on your PATH. | Install PHP 8.2+, then restart VS Code. |
+| `No application encryption key has been specified`, or other config errors | The `.env` file is missing. | Rename `.env.example` to `.env` (step 2). |
+| `could not find driver` | The SQLite driver is turned off in PHP. | Enable `pdo_sqlite` in `php.ini`. Run `php --ini` to find where that file is. |
+| `Failed opening required ... vendor/autoload.php`, or `Failed to open stream: No such file or directory ... artisan on line 10` | The `vendor` folder is missing. It isn't stored in Git, so `git clone` doesn't include it. | Run `composer install`. See [Fixing the missing `vendor` folder](#fixing-the-missing-vendor-folder). |
+| `Class "..." not found` | The `vendor` folder is incomplete. | Run `composer install`. See the section below. |
+| `Class ... not found` or `Unable to read ... services.php` **after moving or copying the folder** | Cached files still point to the old location. | Delete `bootstrap/cache/packages.php` and `bootstrap/cache/services.php`. They're rebuilt automatically. |
+| Autoload errors still appear | The autoloader needs rebuilding. | If Composer is installed, run `composer dump-autoload` in the project folder. |
+| `Address already in use` | Port 8000 is already being used. | Run `php artisan serve --port=8080` and open http://127.0.0.1:8080 instead. |
+
+---
 
 ## Fixing the missing `vendor` folder
 
-You'll see this error when you run `php artisan serve`:
+If you see this when running `php artisan serve`:
 
 ```
 PHP Warning:  require(.../vendor/autoload.php): Failed to open stream: No such file or directory in .../artisan on line 10
 Uncaught Error: Failed opening required '.../vendor/autoload.php'
 ```
 
-It means the `vendor` folder (the PHP dependencies) isn't in the project. Install it with Composer:
+the `vendor` folder (the PHP dependencies) is missing. Install it with Composer:
 
-1. Install Composer from https://getcomposer.org/download/ (internet needed), then restart VS Code. Check it with `composer --version`.
-2. In the VS Code terminal, from the project folder (the one containing `artisan`), run:
+1. **Install Composer** from https://getcomposer.org/download/ (internet needed), then restart VS Code.
+   Check that it worked:
+
+   ```
+   composer --version
+   ```
+
+2. **Install the dependencies.** In the VS Code terminal, make sure you're in the project folder (the one that contains the `artisan` file), then run:
 
    ```
    composer install
    ```
 
-3. Confirm the `vendor` folder now exists next to `artisan`.
-4. Run `php artisan serve` again.
+3. **Check** that a `vendor` folder now appears next to `artisan`.
 
-If it still fails, delete `bootstrap/cache/packages.php` and `bootstrap/cache/services.php` and restart the server.
+4. **Start the app again:**
+
+   ```
+   php artisan serve
+   ```
+
+**Still not working?** Delete `bootstrap/cache/packages.php` and `bootstrap/cache/services.php`, then restart the server.
